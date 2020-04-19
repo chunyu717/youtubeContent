@@ -1,0 +1,18 @@
+$icon-default-size: 30px;
+$icon-list: taiwan japan us;
+
+@each $icon in $icon-list {
+  .icon-#{$icon} {
+    background: url("../assets/#{$icon}.svg");
+  }
+}
+
+.icon {
+  width: $icon-default-size;
+  height: $icon-default-size;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+  margin: 0 5px;
+}
