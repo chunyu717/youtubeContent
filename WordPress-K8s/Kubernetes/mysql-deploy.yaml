@@ -1,0 +1,67 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  #namespace: wp 
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - name: mysqlport
+      protocol: TCP
+      port: 3306
+      targetPort: dbport
+  selector:
+    app: wordpress
+    tier: mysql
+ #clusterIP: None
+  # if give None it will not give clusterIP. your can't access this service by cluserIp 
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  #namespace: wp 
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: wordpress
+        - name: MYSQL_USER
+          value: wordpress
+        - name: MYSQL_PASSWORD
+          value: wordpress 
+        - name: MYSQL_ROOT_PASSWORD
+          value:  
+          #valueFrom:
+          #  secretKeyRef:
+          #    name: mysql-pass
+          #    key: password
+        ports:
+        - containerPort: 3306
+          name: dbport 
+        volumeMounts:
+        - name: db-content
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-content
+        hostPath:
+          path: /home/jerry/wp-k8s/db_data2
+          type: Directory
